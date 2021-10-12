@@ -1,9 +1,11 @@
 <?php
 
+namespace Braunstetter\DataGridBundle\Twig;
+
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class Extension extends AbstractExtension
+class DataGridExtension extends AbstractExtension
 {
     public function getFunctions(): array
     {

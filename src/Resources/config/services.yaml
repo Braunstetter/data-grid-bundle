@@ -1,0 +1,25 @@
+services:
+  Braunstetter\DataGridBundle\Twig\DataGridExtension:
+    tags: [ 'twig.extension' ]
+
+  Braunstetter\DataGridBundle\GridRenderer:
+    tags: [ 'twig.runtime' ]
+    arguments:
+      - '@Braunstetter\DataGridBundle\GridRendererEngine'
+
+  Braunstetter\DataGridBundle\GridRendererEngine:
+    arguments:
+      - [ 'default_grid.html.twig' ]
+      - '@twig'
+
+  Braunstetter\DataGridBundle\DataGridRegistry:
+    arguments: [!tagged_locator { tag: 'grid.type' }]
+
+  Braunstetter\DataGridBundle\GridFactory:
+    public: true
+    arguments:
+      - '@Braunstetter\DataGridBundle\DataGridRegistry'
+
+  Braunstetter\DataGridBundle\Types\GridType:
+    tags: ['grid.type']
+

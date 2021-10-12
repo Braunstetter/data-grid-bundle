@@ -1,6 +1,6 @@
 <?php
 
-namespace Braunstetter\DataGridBundle;
+namespace Braunstetter\DataGridBundle\Views;
 
 class GridRowView
 {
