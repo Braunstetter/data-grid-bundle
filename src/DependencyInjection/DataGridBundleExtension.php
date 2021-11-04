@@ -2,6 +2,7 @@
 
 namespace Braunstetter\DataGridBundle\DependencyInjection;
 
+use Braunstetter\DataGridBundle\Contracts\FieldTypeInterface;
 use Braunstetter\DataGridBundle\Contracts\GridTypeInterface;
 use Exception;
 use Symfony\Component\Config\FileLocator;
@@ -22,5 +23,8 @@ class DataGridBundleExtension extends Extension
 
         $container->registerForAutoconfiguration(GridTypeInterface::class)
             ->addTag('grid.type');
+
+        $container->registerForAutoconfiguration(FieldTypeInterface::class)
+            ->addTag('grid.field_type');
     }
 }

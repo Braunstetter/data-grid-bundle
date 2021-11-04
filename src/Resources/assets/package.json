@@ -1,0 +1,36 @@
+{
+  "name": "@braunstetter/data-grid",
+  "version": "0.1.0",
+  "description": "Javascript for @braunstetter/data-grid-bundle",
+  "author": "Michael Brauner",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "dev-server": "encore dev-server",
+    "dev": "encore dev",
+    "watch": "encore dev --watch",
+    "build": "encore production --progress"
+  },
+  "symfony": {
+    "controllers": {
+      "bulk": {
+        "main": "controllers/bulk_controller.js",
+        "webpackMode": "eager",
+        "fetch": "eager",
+        "enabled": true
+      }
+    }
+  },
+  "devDependencies": {
+    "@symfony/webpack-encore": "^1.5.0",
+    "autoprefixer": "^10.3.1",
+    "file-loader": "^6.0.0",
+    "postcss": "^8.3.5",
+    "postcss-import": "^14.0.2",
+    "postcss-loader": "^5.0.0",
+    "postcss-nested": "^5.0.6",
+    "postcss-nested-ancestors": "^2.0.0",
+    "stimulus-checkbox-select-all": "^5.0.0",
+    "tailwindcss": "^2.2.4"
+  }
+}

@@ -1,0 +1,137 @@
+{%- extends '@Pagerfanta/default.html.twig' -%}
+
+{%- block pager -%}
+    {# Previous Page Link #}
+    {%- if pagerfanta.hasPreviousPage() -%}
+        {%- set path = route_generator.route(pagerfanta.getPreviousPage()) -%}
+        {{- block('previous_page_link') -}}
+    {%- else -%}
+        {{- block('previous_page_link_disabled') -}}
+    {%- endif -%}
+
+    <div class="pagination-container">
+
+        {# First Page Link #}
+        {%- if start_page > 1 -%}
+            {%- set page = 1 -%}
+            {%- set path = route_generator.route(page) -%}
+            {{- block('page_link') -}}
+        {%- endif -%}
+
+        {# Second Page Link, displays if we are on page 3 #}
+        {%- if start_page == 3 -%}
+            {%- set page = 2 -%}
+            {%- set path = route_generator.route(page) -%}
+            {{- block('page_link') -}}
+        {%- endif -%}
+
+        {# Separator, creates a "..." separator to limit the number of items if we are starting beyond page 3 #}
+        {%- if start_page > 3 -%}
+            {{- block('ellipsis') -}}
+        {%- endif -%}
+
+        {# Page Links #}
+        {%- for page in range(start_page, end_page) -%}
+            {%- set path = route_generator.route(page) -%}
+            {%- if page == current_page -%}
+                {{- block('current_page_link') -}}
+            {%- else -%}
+                {{- block('page_link') -}}
+            {%- endif -%}
+        {%- endfor -%}
+
+        {# Separator, creates a "..." separator to limit the number of items if we are over 3 pages away from the last page #}
+        {%- if end_page < (nb_pages - 2) -%}
+            {{- block('ellipsis') -}}
+        {%- endif -%}
+
+        {# Second to Last Page Link, displays if we are on the third from last page #}
+        {%- if end_page == (nb_pages - 2) -%}
+            {%- set page = (nb_pages - 1) -%}
+            {%- set path = route_generator.route(page) -%}
+            {{- block('page_link') -}}
+        {%- endif -%}
+
+        {# Last Page Link #}
+        {%- if nb_pages > end_page -%}
+            {%- set page = nb_pages -%}
+            {%- set path = route_generator.route(page) -%}
+            {{- block('page_link') -}}
+        {%- endif -%}
+
+        {# pagination-container end #}
+    </div>
+
+    {# Next Page Link #}
+    {%- if pagerfanta.hasNextPage() -%}
+        {%- set path = route_generator.route(pagerfanta.getNextPage()) -%}
+        {{- block('next_page_link') -}}
+    {%- else -%}
+        {{- block('next_page_link_disabled') -}}
+    {%- endif -%}
+{%- endblock pager -%}
+
+{%- block previous_page_link -%}
+
+    {{ _self.itemPage({
+        attr: { class: 'pagination__item pagination__item--previous-page' },
+        path: path, rel: 'prev', message_block_key: 'previous_page_message', svg: '@DataGrid/svg/prev.svg'
+    }, options) }}
+
+{%- endblock previous_page_link -%}
+
+{%- block previous_page_link_disabled -%}
+
+    {{ _self.itemPage({
+        attr: { class: 'pagination__item pagination__item--previous-page pagination__item--disabled' },
+        rel: 'prev', message_block_key: 'previous_page_message', svg: '@DataGrid/svg/prev.svg', disabled: true
+    }, options) }}
+
+{%- endblock previous_page_link_disabled -%}
+
+{%- block next_page_link -%}
+
+    {{ _self.itemPage({
+        attr: { class: 'pagination__item pagination__item--next-page' },
+        path: path, rel: 'next', message_block_key: 'next_page_message', svg: '@DataGrid/svg/next.svg'
+    }, options) }}
+
+{%- endblock next_page_link -%}
+
+{%- block next_page_link_disabled -%}
+    {{ _self.itemPage({
+        attr: { class: 'pagination__item pagination__item--next-page pagination__item--disabled' },
+        path: path, rel: 'next', message_block_key: 'next_page_message', svg: '@DataGrid/svg/next.svg', disabled: true
+    }, options) }}
+{%- endblock next_page_link_disabled -%}
+
+{%- block previous_page_message -%}
+    {%- from '@BabDevPagerfanta/macros.html.twig' import resolve_previous_page_message -%}
+    {{- resolve_previous_page_message(options) -}}
+{%- endblock previous_page_message -%}
+
+{%- block next_page_message -%}
+    {%- from '@BabDevPagerfanta/macros.html.twig' import resolve_next_page_message -%}
+    {{- resolve_next_page_message(options) -}}
+{%- endblock next_page_message -%}
+
+{% macro itemPage(config, options) %}
+    {% set disabled = config.disabled ?? false %}
+    {% from '@DataGrid/Macro/helper.twig' import renderAttr %}
+    <div {{- renderAttr(config.attr) -}}>
+        {% if not disabled %}
+            <a href="{{- config.path -}}" rel="{{- config.rel -}}">
+                {% if config.rel is same as('prev') %} {{ source(config.svg) }} {% endif %}
+                {{- block(config.message_block_key) -}}
+                {% if config.rel is same as('next') %} {{ source(config.svg) }} {% endif %}
+            </a>
+        {% else %}
+            <div>
+                {% if config.rel is same as('prev') %} {{ source(config.svg) }} {% endif %}
+                {{- block(config.message_block_key) -}}
+                {% if config.rel is same as('next') %} {{ source(config.svg) }} {% endif %}
+            </div>
+        {% endif %}
+    </div>
+{% endmacro %}
+

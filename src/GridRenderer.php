@@ -35,6 +35,7 @@ class GridRenderer implements GridRendererInterface
 
     public function renderBlock(GridView $view, string $blockName, array $variables = []): string
     {
+
         $resource = $this->engine->getResourceForBlockName($view, $blockName);
 
         if (!$resource) {
@@ -59,6 +60,7 @@ class GridRenderer implements GridRendererInterface
 
             $varInit = false;
         }
+        dump($view->getGrid());
 
         // Merge the passed with the existing attributes
         if (isset($variables['attr']) && isset($scopeVariables['attr'])) {
@@ -89,10 +91,10 @@ class GridRenderer implements GridRendererInterface
     {
         $renderOnlyOnce = 'row' === $blockNameSuffix || 'widget' === $blockNameSuffix;
 
-        if ($renderOnlyOnce && $view->isRendered()) {
-            // This is not allowed, because it would result in rendering same IDs multiple times, which is not valid.
-            throw new BadMethodCallException(sprintf('Field "%s" has already been rendered, save the result of previous render call to a variable and output that instead.', $view->vars['name']));
-        }
+//        if ($renderOnlyOnce && $view->isRendered()) {
+//            // This is not allowed, because it would result in rendering same IDs multiple times, which is not valid.
+//            throw new BadMethodCallException(sprintf('Field "%s" has already been rendered, save the result of previous render call to a variable and output that instead.', $view->vars['name']));
+//        }
 
         // The cache key for storing the variables and types
         $viewCacheKey = $view->vars[self::CACHE_KEY_VAR];
@@ -228,9 +230,9 @@ class GridRenderer implements GridRendererInterface
             unset($this->variableStack[$viewCacheKey]);
         }
 
-        if ($renderOnlyOnce) {
-            $view->setRendered();
-        }
+//        if ($renderOnlyOnce) {
+//            $view->setRendered();
+//        }
 
         return $html;
     }

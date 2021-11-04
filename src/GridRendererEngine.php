@@ -27,6 +27,7 @@ class GridRendererEngine extends AbstractGridRendererEngine
 
     public function renderBlock(GridView $view, $resource, string $blockName, array $variables = [])
     {
+
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
 
         $context = $this->environment->mergeGlobals($variables);

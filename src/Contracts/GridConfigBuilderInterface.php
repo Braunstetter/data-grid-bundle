@@ -4,9 +4,8 @@ namespace Braunstetter\DataGridBundle\Contracts;
 
 use Braunstetter\DataGridBundle\GridConfigBuilder;
 
-interface GridConfigBuilderInterface
+interface GridConfigBuilderInterface extends GridConfigInterface
 {
     public function getGridConfig(): GridConfigBuilder;
-    public function getName(): string;
-    public function getType(): GridTypeInterface;
+    
 }

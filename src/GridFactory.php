@@ -7,7 +7,6 @@ use Braunstetter\DataGridBundle\Contracts\GridFactoryInterface;
 use Braunstetter\DataGridBundle\Contracts\GridInterface;
 use Braunstetter\DataGridBundle\Types\GridType;
 use Exception;
-use Traversable;
 use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 
 class GridFactory implements GridFactoryInterface
@@ -30,8 +29,12 @@ class GridFactory implements GridFactoryInterface
     /**
      * @throws Exception|ExceptionInterface
      */
-    public function createBuilder(iterable $data, string $type = GridType::class, array $options = []): GridBuilderInterface
+    public function createBuilder(iterable $data, string $type = GridType::class, array $options = []): GridBuilderInterface|bool
     {
+        if (!$this->registry->hasType($type)) {
+            return false;
+        }
+
         return $this->createNamedBuilder($this->registry->getType($type)->getBlockPrefix(), $data, $options, $type);
     }
 

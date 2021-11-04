@@ -1,0 +1,5 @@
+@layer utilities {
+    .svg-sm {
+        @apply h-5 w-5;
+    }
+}

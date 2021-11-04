@@ -2,16 +2,13 @@
 
 namespace Braunstetter\DataGridBundle\Contracts;
 
+use Braunstetter\DataGridBundle\Views\GridRowView;
+use Braunstetter\DataGridBundle\Views\GridView;
 use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 interface GridTypeInterface
 {
-    public function buildGrid(GridBuilderInterface $builder, array $options);
-
-    public function buildView();
-
-    public function finishView();
 
     /**
      * @throws ExceptionInterface
@@ -30,6 +27,9 @@ interface GridTypeInterface
      */
     public function getBlockPrefix(): string;
 
+    public function buildGrid(GridBuilderInterface $builder, array $options);
+    public function buildView(GridViewInterface $view, array $options): GridView;
 
+    public function buildRowView(GridRowView $view, array $options): GridRowView;
 
 }

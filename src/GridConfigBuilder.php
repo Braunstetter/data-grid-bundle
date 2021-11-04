@@ -14,6 +14,7 @@ class GridConfigBuilder implements GridConfigBuilderInterface
     private array $options;
     private GridFactoryInterface $gridFactory;
     private iterable $data;
+    protected array $fields;
 
     /**
      * Creates an empty form configuration.
@@ -124,6 +125,22 @@ class GridConfigBuilder implements GridConfigBuilderInterface
     {
         $this->data = $data;
         return $this;
+    }
+
+    /**
+     * @return iterable
+     */
+    public function getData(): iterable
+    {
+        return $this->data;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFields(): array
+    {
+        return $this->fields;
     }
 
 }

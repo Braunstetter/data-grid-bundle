@@ -5,9 +5,15 @@ namespace Braunstetter\DataGridBundle\Types;
 use Braunstetter\DataGridBundle\Contracts\GridBuilderInterface;
 use Braunstetter\DataGridBundle\Contracts\GridFactoryInterface;
 use Braunstetter\DataGridBundle\Contracts\GridTypeInterface;
+use Braunstetter\DataGridBundle\Contracts\GridViewInterface;
 use Braunstetter\DataGridBundle\GridBuilder;
+use Braunstetter\DataGridBundle\Util;
+use Braunstetter\DataGridBundle\Views\GridRowView;
+use Braunstetter\DataGridBundle\Views\GridView;
+use Pagerfanta\PagerfantaInterface;
 use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use function PHPUnit\Framework\isInstanceOf;
 
 abstract class BaseType implements GridTypeInterface
 {
@@ -16,28 +22,59 @@ abstract class BaseType implements GridTypeInterface
      */
     private OptionsResolver $optionsResolver;
 
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->define('pagination_view')
+            ->allowedTypes('string')
+            ->default('twig')
+            ->info('Define the view for the pagerfanta renderer.');
+
+        $resolver->define('pagination_template')
+            ->allowedTypes('string')
+            ->default('@DataGrid/pagination/default.html.twig')
+            ->info('Define the template used by the pagerfanta renderer.');
+
+        $resolver->define('show_bulk_actions')
+            ->allowedTypes('bool')
+            ->default(true)
+            ->info('Define if the grid should show bulk actions or not.');
+    }
+
     public function buildGrid(GridBuilderInterface $builder, array $options)
     {
     }
 
-    public function buildView()
+    public function buildView(GridViewInterface $view, array $options): GridView
     {
-        // TODO: Implement buildView() method.
+        $data = $view->getGrid()->getConfig()->getData();
+
+        if (!isset($options['pagination'])) {
+            $view->vars = array_replace($view->vars, ['pagination' => $data instanceof PagerfantaInterface]);
+        }
+
+        $view->vars = array_replace($view->vars, [
+            'pagination_view' => $options['pagination_view'],
+            'pagination_template' => $options['pagination_template'],
+        ]);
+
+        if ($options['show_bulk_actions']) {
+            foreach ($view->getActions() as $field) {
+                dump($field);
+            }
+        }
+
+        dump($view, $options, $view->getFields(), $view->getActions(), $view->getBulkActions());
+        return $view;
     }
 
-    public function finishView()
+    public function buildRowView(GridRowView $view, array $options): GridRowView
     {
-        // TODO: Implement finishView() method.
-    }
-
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        // TODO: Implement configureOptions() method.
+        return $view;
     }
 
     public function getBlockPrefix(): string
     {
-        return static::fqcnToBlockPrefix(static::class) ?: '';
+        return Util::fqcnToBlockPrefix(static::class) ?: '';
     }
 
     /**
@@ -48,14 +85,15 @@ abstract class BaseType implements GridTypeInterface
         try {
             $options = $this->getOptionsResolver()->resolve($options);
         } catch (ExceptionInterface $e) {
-            throw new $e(sprintf('An error has occurred resolving the options of the form "%s": ', get_debug_type($this)).$e->getMessage(), $e->getCode(), $e);
+            throw new $e(sprintf('An error has occurred resolving the options of the grid "%s": ', get_debug_type($this)) . $e->getMessage(), $e->getCode(), $e);
         }
 
-        $builder = $this->newBuilder($factory, $name, $data , $options);
+        $builder = $this->newBuilder($factory, $name, $data, $options);
         $builder->setType($this);
 
         return $builder;
     }
+
     /**
      * Creates a new builder instance.
      *
@@ -66,23 +104,6 @@ abstract class BaseType implements GridTypeInterface
     protected function newBuilder(GridFactoryInterface $factory, string $name, iterable $data, array $options): GridBuilderInterface
     {
         return new GridBuilder($name, $factory, $data, $options);
-    }
-
-    /**
-     * Converts a fully-qualified class name to a block prefix.
-     *
-     * @param string $fqcn The fully-qualified class name
-     *
-     * @return string|null The block prefix or null if not a valid FQCN
-     */
-    public static function fqcnToBlockPrefix(string $fqcn): ?string
-    {
-        // Non-greedy ("+?") to match "type" suffix, if present
-        if (preg_match('~([^\\\\]+?)(type)?$~i', $fqcn, $matches)) {
-            return strtolower(preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'], ['\\1_\\2', '\\1_\\2'], $matches[1]));
-        }
-
-        return null;
     }
 
     /**

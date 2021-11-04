@@ -4,11 +4,11 @@ namespace Braunstetter\DataGridBundle\Views;
 
 class GridRowView
 {
-    private GridView $gridView;
+    private $data;
 
-    public function __construct(GridView $gridView)
+    public function __construct($data)
     {
-        $this->gridView = $gridView;
+        $this->data = $data;
     }
 
     /**
@@ -25,8 +25,12 @@ class GridRowView
      */
     public array $children = [];
 
-    public function getGridView() : GridView
+    /**
+     * @return mixed
+     */
+    public function getData()
     {
-        return $this->getGridView();
+        return $this->data;
     }
+
 }

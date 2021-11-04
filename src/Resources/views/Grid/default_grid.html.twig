@@ -1,3 +1,196 @@
 {% block grid %}
-    {{ dump() }}
+    {% css '/bundles/datagrid/bundle.css' %}
+    {{ grid_start(grid) }}
 {% endblock %}
+
+{% block grid_start %}
+    <div class="data-grid">
+        {{ block('grid_table') }}
+        {{ grid_pager(grid) }}
+    </div>
+{% endblock %}
+
+{% block grid_table %}
+
+    <div class="grid-header">
+        <div class="grid-header-left"></div>
+        <div class="grid-header-right">
+            {{ block('bulk_actions') }}
+        </div>
+    </div>
+
+    <table data-controller="bulk">
+        {{ grid_head(grid) }}
+        {{ grid_body(grid) }}
+    </table>
+{% endblock %}
+
+{% block grid_head %}
+    <thead>
+    <tr>
+        {% if grid.hasBulkActions %}
+            <th scope="col">
+                <input type="checkbox" data-bulk-target="checkboxAll" aria-label="{{ 'Alle auswählen'|trans }}">
+            </th>
+        {% endif %}
+
+        {% for field in grid.gridFields %}
+            <th scope="col">{{ block('field_label') }}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+{% endblock %}
+
+{% block grid_body %}
+    <tbody>
+
+    {% for row in grid.gridRows %}
+        <tr>
+            {% if grid.hasBulkActions %}
+                <td>
+                    <input type="checkbox" data-bulk-target="checkbox" aria-label="{{ 'Auswählen'|trans }}">
+                </td>
+            {% endif %}
+
+            {% for field in grid.gridFields %}
+                {% apply spaceless %}
+
+                    <td {% with {attr: field.vars.attr} %}{{ block('attributes') }}{% endwith %}>
+                        {% if field.vars.target_url is defined %}
+                            {{ block('field_value_link') }}
+                        {% else %}
+                            {{ block('field_value') }}
+                        {% endif %}
+                    </td>
+
+                {% endapply %}
+            {% endfor %}
+
+        </tr>
+    {% endfor %}
+
+    </tbody>
+{% endblock %}
+
+{%- block field_label -%}
+    <div>
+        {% if field.vars.label_icon is defined %} {{ source(field.vars.label_icon) }} {% endif %}
+
+        {% if field.vars.label_sr_only %}
+            <span class="sr-only">{{ field.vars.label }}</span>
+        {% else %}
+            {{ field.vars.label }}
+        {% endif %}
+    </div>
+{%- endblock -%}
+
+{% block field_value %}
+    {% set value = field.value(row.data) %}
+
+    {% if value.timestamp is defined %}
+        {{ block('date_value') }}
+    {% else %}
+        {{ block('simple_value') }}
+    {% endif %}
+
+{% endblock %}
+
+{% block field_value_link %}
+    <a href="{{ field.url(row.data) }}"
+       type="button" {% with {attr: field.vars.link_attr} %}{{ block('attributes') }}{% endwith %}>{{ block('field_value') }}</a>
+{% endblock %}
+
+{%- block simple_value -%}
+    <div>
+        {% if field.vars.value_icon is defined %} {{ source(field.vars.value_icon) }} {% endif %}
+        {% if field.vars.action_type is defined %} {{ field.vars.label }} {% else %} {{ value }} {% endif %}
+    </div>
+{%- endblock -%}
+
+{% block date_value %}
+    {{ value|date('Y-m-d H:i:s') ?: '' }}
+{% endblock %}
+
+{% block grid_pager %}
+    {{ pagerfanta(grid.grid.config.data, grid.vars.pagination_view, {template: grid.vars.pagination_template}) }}
+{% endblock %}
+
+{% block attributes -%}
+    {% from '@DataGrid/Macro/helper.twig' import renderAttr %}
+    {{ renderAttr(attr) }}
+{%- endblock attributes -%}
+
+{% block bulk_actions %}
+
+    {% import '@DataGrid/Macro/transition.twig' as transition %}
+
+    <div class="dropdown" data-controller="braunstetter--control-panel-bundle--menu">
+
+        <button type="button" id="bulk-button" aria-expanded="false" aria-haspopup="true"
+                data-braunstetter--control-panel-bundle--menu-target="opener">
+            Options
+            {{ source('@DataGrid/svg/chevron_down.svg') }}
+        </button>
+
+        <div role="menu" aria-orientation="vertical" aria-labelledby="bulk-button" class="bulk-dropdown-container"
+             tabindex="-1" {{ transition.fadeInOut() }} data-braunstetter--control-panel-bundle--menu-target="content">
+
+            <div role="none">
+
+                <!-- Active: "bg-gray-100 text-gray-900", Not Active: "text-gray-700" -->
+                <a href="#" class="group" role="menuitem" tabindex="-1" id="menu-item-0">
+                    {{ source('@DataGrid/svg/edit.svg') }}
+                    Edit
+                </a>
+
+                <a href="#" class="group" role="menuitem" tabindex="-1" id="menu-item-1">
+                    {{ source('@DataGrid/svg/duplicate.svg') }}
+                    Duplicate
+                </a>
+
+            </div>
+
+            <div role="none">
+
+                <a href="#" class="group" role="menuitem" tabindex="-1" id="menu-item-2">
+                    {{ source('@DataGrid/svg/archive.svg') }}
+                    Archive
+                </a>
+                <a href="#" class="group" role="menuitem" tabindex="-1" id="menu-item-3">
+                    {{ source('@DataGrid/svg/move.svg') }}
+                    Move
+                </a>
+
+            </div>
+
+            <div role="none">
+
+                <a href="#" class="group" role="menuitem" tabindex="-1" id="menu-item-4">
+                    {{ source('@DataGrid/svg/share.svg') }}
+                    Share
+                </a>
+                <a href="#" class="group" role="menuitem" tabindex="-1" id="menu-item-5">
+                    {{ source('@DataGrid/svg/favorite.svg') }}
+                    Add to favorites
+                </a>
+
+            </div>
+
+            <div role="none">
+                <a href="#" class="group" role="menuitem" tabindex="-1" id="menu-item-6">
+                    {{ source('@DataGrid/svg/trash.svg') }}
+                    Delete
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+
+
+
+
+
+
